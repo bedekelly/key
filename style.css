@@ -1,0 +1,35 @@
+.background {
+    transition: background-color 0.5s ease;
+    background-color: #3498db;
+    width: 100vw;
+    height: 100vh;
+}
+
+h1 {
+    text-align: center;
+    margin: auto;
+    height: auto;
+    position: absolute;
+    top: 35vh; left: 0; bottom: 0; right: 0;
+    font-size: 20vh;
+    color: #ecf0f1;
+}
+
+h1>.my-glyph {
+    font-size: 15vh;
+    top: 10px;
+    right: 40px;
+}
+
+.instructions {
+    visibility: hidden;
+    position: absolute;
+    text-align: left;
+    color: #ecf0f1;
+    bottom: 5vh;
+    left: 5vw;
+}
+
+.instructions>h3 {
+    font-size: 5vh;
+}
