@@ -54,23 +54,23 @@
         myKey = newKey;
     }
 
-    
+
     /**
      * Attempt to authenticate with the "remote service" using `key`.
      * @param key The secret key to use.
+     * @returns {boolean} Whether authentication succeeded or not.
      */
     function attemptAuth(key) {
         // I cba to write a 2d Array.prototype.equals, so:
-        if (key[0][0] == myKey[0][0])
-            keyAuth.unlock();
-        else UIWrongPass();
+        if (key[0][0] == myKey[0][0]) return true;
+        else ui.wrongPass(); return false;
     }
 
 
     /**
      * Setup KeyAuth with our UI and "security" functions.
      */
-    var auth = KeyAuth();
+    var auth = new KeyAuth();
     auth.init(attemptAuth, getKeyLength, updateKey, ui.startRecording,
               ui.stopRecording, ui.lock, ui.unlock);
     registerKeyPressCallbacks(auth);

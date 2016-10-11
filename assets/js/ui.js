@@ -15,6 +15,8 @@ var exampleUI = (function() {
             .addClass("glyphicon-ok-circle");
         $(".lock-text").text("Unlocked");
         $(".instructions").css("visibility", "visible");
+        $(".instructions>#lock-text").text("Press L to lock");
+        $(".instructions>#record-text").text("Press R to record")
     }
 
 
@@ -63,6 +65,7 @@ var exampleUI = (function() {
         $("#icon")
             .removeClass("glyphicon-record")
             .addClass("glyphicon-ok-circle");
+
         UIUnlock();
     }
 

@@ -1,4 +1,4 @@
-var KeyAuth = (function(){
+var KeyAuth = function(){
     
     // Private internal variables:
     var NOTE_OFF = 128, NOTE_ON = 144;
@@ -29,7 +29,7 @@ var KeyAuth = (function(){
         var chords = [];
 
         // Build up an array of chord-arrays from the chord-sets we have now.
-        CHORDS.forEach(function(e, _){
+        CHORDS.forEach(function(e){
             chords.push(Array.from(e));
         });
 
@@ -48,7 +48,6 @@ var KeyAuth = (function(){
      */
     function notePressed(note) {
         CURRENT_CHORD.add(note);
-        console.log(CURRENT_CHORD);
 
         /* A "chord" in our sequence is the longest array of notes played at
          * once. In case of a tie, the latest array is chosen.
@@ -61,31 +60,27 @@ var KeyAuth = (function(){
     /**
      * Handler for when a note is released on the midi keyboard.
      * @param note An identifier for the note. Should be a unique integer.
+     * @param auth An instance of KeyAuth.
      */
-    function noteReleased(note) {
+    function noteReleased(note, auth) {
         CURRENT_CHORD.delete(note);
 
         // Handle the case where no notes are pressed any more.
         if (CURRENT_CHORD.size == 0) {
             CHORDS.push(MAX_CHORD);
-            console.log(CHORDS.length);
             MAX_CHORD = new Set();
 
             // If we're not authorized already, try to login.
             var keyLength = GET_KEY_LENGTH();
-            console.log("Authorized: "+AUTHORIZED);
-            console.log("CHORDS length: "+CHORDS.length);
-            console.log("Key length: "+keyLength);
-
             if (!AUTHORIZED && CHORDS.length == keyLength) {
-                // Convert CHORDS to a 2d array and authenticate.
+                // Convert CHORDS to a 2d array.
                 var chords = [];
-                CHORDS.forEach(function(e, _){
+                CHORDS.forEach(function(e){
                     chords.push(Array.from(e));
                 });
-                console.log("will attempt auth");
-                AUTH_FN(chords);
 
+                // Authenticate and reset.
+                if (AUTH_FN(chords)) auth.unlock();
                 CHORDS = new FixedQueue(keyLength);
             }
         }
@@ -96,18 +91,19 @@ var KeyAuth = (function(){
      * Callback for when a MIDI message is received. Read the MIDI data and
      * delegate to notePressed and noteReleased where appropriate.
      * @param message The MIDI message, as an Array of bytes.
+     * @param auth An instance of KeyAuth.
      */
-    function onMidiMessage(message) {
+    function onMidiMessage(message, auth) {
         // Extract information from MIDI data.
         var messageType = message.data[0] & 0xf0;
         var note = message.data[1];
 
         switch(messageType) {
             case NOTE_ON:
-                notePressed(note);
+                notePressed(note, auth);
                 break;
             case NOTE_OFF:
-                noteReleased(note);
+                noteReleased(note, auth);
         }
     }
 
@@ -115,14 +111,17 @@ var KeyAuth = (function(){
     /**
      * Handler for when MIDI support is successfully confirmed.
      * @param midiAccess A MIDI Access object to interact with MIDI devices.
+     * @param auth An instance of KeyAuth.
      */
-    function onMidiSuccess(midiAccess) {
+    function onMidiSuccess(midiAccess, auth) {
         var inputs = midiAccess.inputs.values();
 
         // For each MIDI device:
         for (var input=inputs.next(); input&&!input.done; input=inputs.next()){
             // Register our onMidiMessage function as a callback.
-            input.value.onmidimessage = onMidiMessage;
+            input.value.onmidimessage = function(message){
+                onMidiMessage(message, auth)
+            };
         }
     }
 
@@ -131,11 +130,11 @@ var KeyAuth = (function(){
      * Attempt to setup MIDI interaction, logging a failure to the console
      * where MIDI support isn't available.
      */
-    function setupMidi(){
+    function setupMidi(auth) {
         if (navigator.requestMIDIAccess) {
             navigator.requestMIDIAccess({
                 sysex: false
-            }).then(onMidiSuccess)
+            }).then(function(midiAccess){onMidiSuccess(midiAccess, auth)})
         } else {
             console.log("No midi support available.");
         }
@@ -154,7 +153,9 @@ var KeyAuth = (function(){
      * @param lock This function will be called when we deauthorize ("lock").
      * @param unlock This function will be called when we authorize ("unlock").
      */
-    function init(attemptAuth, getKeyLength, updateKey, startRecord, stopRecord, lock, unlock) {
+    function init(attemptAuth, getKeyLength, updateKey, startRecord,
+                  stopRecord, lock, unlock)
+    {
         AUTH_FN = attemptAuth;
         UPDATE_FN = updateKey;
         GET_KEY_LENGTH = getKeyLength;
@@ -163,19 +164,10 @@ var KeyAuth = (function(){
         LOCK_FN = lock;
         UNLOCK_FN = unlock;
         CHORDS = new FixedQueue(getKeyLength());
-        setupMidi();
+        setupMidi(this);
     }
 
 
-    /**
-     * If we're recording, stop. Otherwise start recording.
-     */
-    function toggleRecord() {
-        if (RECORDING) stopRecording();
-        else startRecording();
-    }
-
-    
     /**
      * Lock KeyAuth. It's the responsibility of LOCK_FN to delete any access
      * tokens we may have.
@@ -198,6 +190,15 @@ var KeyAuth = (function(){
 
 
     /**
+     * If we're recording, stop. Otherwise start recording.
+     */
+    function toggleRecord() {
+        if (RECORDING) stopRecording();
+        else startRecording();
+    }
+
+
+    /**
      * @returns {boolean} Is KeyAuth currently authorized (unlocked)?
      */
     function isAuthorized() {
@@ -205,20 +206,9 @@ var KeyAuth = (function(){
     }
 
 
-    /**
-     * @returns {boolean} Is KeyAuth currently recording?
-     */
-    function isRecording() {
-        return RECORDING;
-    }
-
-    
-    return {
-        toggleRecord: toggleRecord,
-        isRecording: isRecording,
-        isAuthorized: isAuthorized,
-        lock: lock,
-        unlock: unlock,
-        init: init
-    }
-})();
+    this.init = init;
+    this.lock = lock;
+    this.unlock = unlock;
+    this.toggleRecord = toggleRecord;
+    this.isAuthorized = isAuthorized;
+};
