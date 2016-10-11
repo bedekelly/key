@@ -2,45 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MusicAuth</title>
+    <title>key.</title>
 
+    <!-- JQuery because I can't be bothered with the DOM. -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.js"></script>
-    <link href="hover.css" rel="stylesheet" media="all">
 
-    <!-- Latest compiled and minified CSS -->
+    <!-- Including Bootstrap just for glyphicons, sigh. -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-    <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-
-    <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="style.css">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+    <!-- Finally, my own stylesheet. -->
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
 <div class="background">
-    <h1>
-        <span class="my-glyph"><div class="glyphicon glyphicon-remove-circle"></div></span>
+    <h1><!-- "Locked", "Unlocked", "Recording" etc. heading. -->
+        <i id="icon" class="glyphicon glyphicon-remove-circle"></i>
         <span class="lock-text">Locked</span>
     </h1>
 
-    <div class="instructions">
+    <!-- Note that this is hidden by default in CSS. -->
+    <div class="instructions"><!-- "Press R to record" etc. -->
         <h3 id="lock-text">Press L to lock</h3>
         <h3 id="record-text">Press R to record</h3>
     </div>
-
-
 </div>
 
-<script src="FixedLength.js"></script>
-
-<script src="musicAuth.js"></script>
-<script src="main.js"></script>
+<script src="assets/js/FixedLength.js"></script>
+<script src="assets/js/keyAuth.js"></script>
+<script src="assets/js/main.js"></script>
 </body>
 </html>
