@@ -34,10 +34,21 @@ var KeyAuth = function(){
         });
 
         // If we've recorded a new chord sequence, run our update callback.
-        if (chords.length > 0) {UPDATE_FN(chords);}
+        if (chords.length > 0) {
+            UPDATE_FN(chords, function(msg) {
+                console.log(msg);
+            });
+        }
 
         // Reset our queue of currently-played chords, and fire the callback.
-        CHORDS = new FixedQueue(GET_KEY_LENGTH());
+        if (chords.length == 0)
+            GET_KEY_LENGTH(function(length){
+                CHORDS = new FixedQueue(length);
+            });
+        else {
+            CHORDS = new FixedQueue(chords.length);
+        }
+
         STOP_RECORDING_FN();
     }
 
@@ -71,18 +82,20 @@ var KeyAuth = function(){
             MAX_CHORD = new Set();
 
             // If we're not authorized already, try to login.
-            var keyLength = GET_KEY_LENGTH();
-            if (!AUTHORIZED && CHORDS.length == keyLength) {
-                // Convert CHORDS to a 2d array.
-                var chords = [];
-                CHORDS.forEach(function(e){
-                    chords.push(Array.from(e));
-                });
+            GET_KEY_LENGTH(function(keyLength) {
+                if (!AUTHORIZED && CHORDS.length == keyLength) {
+                    // Convert CHORDS to a 2d array.
+                    var chords = [];
+                    CHORDS.forEach(function(e){
+                        chords.push(Array.from(e));
+                    });
 
-                // Authenticate and reset.
-                if (AUTH_FN(chords)) auth.unlock();
-                CHORDS = new FixedQueue(keyLength);
-            }
+                    // Authenticate and reset.
+                    AUTH_FN(chords, auth.unlock);
+                    CHORDS = new FixedQueue(keyLength);
+                }
+            });
+
         }
     }
 
@@ -158,13 +171,17 @@ var KeyAuth = function(){
     {
         AUTH_FN = attemptAuth;
         UPDATE_FN = updateKey;
+
         GET_KEY_LENGTH = getKeyLength;
         START_RECORDING_FN = startRecord;
         STOP_RECORDING_FN = stopRecord;
         LOCK_FN = lock;
         UNLOCK_FN = unlock;
-        CHORDS = new FixedQueue(getKeyLength());
+        getKeyLength(function(length){
+            CHORDS = new FixedQueue(length);
+        });
         setupMidi(this);
+
     }
 
 
@@ -174,9 +191,11 @@ var KeyAuth = function(){
      */
     function lock() {
         if (RECORDING) return;  // Can't lock while recording!
-        CHORDS = new FixedQueue(GET_KEY_LENGTH());
-        AUTHORIZED = false;
-        LOCK_FN();
+        GET_KEY_LENGTH(function(length){
+            CHORDS = new FixedQueue(length);
+            AUTHORIZED = false;
+            LOCK_FN();
+        });
     }
 
     /**
