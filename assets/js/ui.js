@@ -14,8 +14,10 @@ var exampleUI = (function() {
             .removeClass("glyphicon-remove-circle")
             .addClass("glyphicon-ok-circle");
         $(".lock-text").text("Unlocked");
+        $(".secret-info").css("visibility", "visible");
         $(".instructions").css("visibility", "visible");
         $(".instructions>#lock-text").text("Press L to lock");
+        $(".instructions>#record-text").show();
         $(".instructions>#record-text").text("Press R to record")
     }
 
@@ -40,6 +42,7 @@ var exampleUI = (function() {
             .removeClass("glyphicon-ok-circle")
             .addClass("glyphicon-remove-circle");
         $(".lock-text").text("Locked");
+        $(".secret-info").css("visibility", "hidden");
         $(".instructions").css("visibility", "hidden");
     }
 
@@ -53,6 +56,7 @@ var exampleUI = (function() {
             .removeClass("glyphicon-ok-circle")
             .addClass("glyphicon-record");
         $(".lock-text").text("Recording...");
+        $(".secret-info").css("visibility", "hidden");
         $(".instructions>#lock-text").text("");
         $(".instructions>#record-text").text("Press R to stop recording")
     }
@@ -65,7 +69,6 @@ var exampleUI = (function() {
         $("#icon")
             .removeClass("glyphicon-record")
             .addClass("glyphicon-ok-circle");
-
         UIUnlock();
     }
 

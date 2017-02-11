@@ -1,3 +1,18 @@
+var API_URL = "http://localhost:5000";
+
+function getSecretInfo() {
+    jQuery.get(
+        API_URL + "/info?token=" + sessionStorage.getItem("token")
+    ).then(function(response) {
+        $(".secret-text").text(response.message);
+    }, function(err) {
+        err = err.responseJSON.error;
+        $(".secret-text").text(err);
+        $("#record-text").hide();
+    });
+}
+
+
 (function() {
 
     var ui = exampleUI();
@@ -35,7 +50,7 @@
      * ====================================================================== *
      */
 
-    var API_URL = "http://localhost:5000";
+
 
     /**
      * @returns {*} Callback to get length of the secret key required.
@@ -92,6 +107,7 @@
         ).then(function(response){
             onSuccess(response.token);
             sessionStorage.setItem("token", response.token);
+            getSecretInfo();
         }, function(err){
             if (onFailure) onFailure(err.error);
             ui.wrongPass();
@@ -107,3 +123,5 @@
               ui.stopRecording, ui.lock, ui.unlock);
     registerKeyPressCallbacks(auth);
 })();
+
+
