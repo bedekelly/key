@@ -28,7 +28,8 @@ You shouldn't be able to. That's what makes it Very Secure!
 
 **But this isn't secure, is it?**
 
-Nope, not right now. But it's pretty clear in `main.js` which functions would need to be changed to send data to an external API. I'm in the process of writing a suitable backend — it's using a token exchange system somewhat similar to OAuth2.
+Yes! It's using a token exchange system called "lock" similar to that of OAuth2. Check out the backend [here](https://github.com/bedekelly/lock).
+~Nope, not right now. But it's pretty clear in `main.js` which functions would need to be changed to send data to an external API. I'm in the process of writing a suitable backend — it's using a token exchange system somewhat similar to OAuth2.~
 
 
 
