@@ -1,3 +1,18 @@
+var API_URL = "http://localhost:5000";
+
+function getSecretInfo() {
+    jQuery.get(
+        API_URL + "/info?token=" + sessionStorage.getItem("token")
+    ).then(function(response) {
+        $(".secret-text").text(response.message);
+    }, function(err) {
+        err = err.responseJSON.error;
+        $(".secret-text").text(err);
+        $("#record-text").hide();
+    });
+}
+
+
 (function() {
 
     var ui = exampleUI();
@@ -35,35 +50,68 @@
      * ====================================================================== *
      */
 
-    var myKey = [[63], [63], [63]];  // The Eb above middle-C, played 3 times.
 
-    
+
     /**
-     * @returns {Number} The length of the secret key required.
+     * @returns {*} Callback to get length of the secret key required.
      */
-    function getKeyLength(){
-        return myKey.length;
+    function getKeyLength(cb){
+        jQuery.get(
+            API_URL + "/auth/keylength"
+        ).then(function(response) {
+            cb(response.keylength);
+        })
     }
 
     
     /**
      * Update the "remote service" with a new secret key.
+     * @param cb
      * @param newKey The new secret key.
      */
-    function updateKey(newKey) {
-        myKey = newKey;
+    function updateKey(newKey, cb) {
+        console.log(cb);
+        console.log(newKey);
+        var token = sessionStorage.getItem("token");
+        jQuery.ajax(
+            {
+                url: API_URL + "/auth/key?token=" + token,
+                type: "POST",
+                data: JSON.stringify({
+                    key: newKey
+                }),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json'
+            }
+        ).then(function(response) {
+            cb(response.message);
+        });
+    }
+
+
+    function formatKey(key) {
+        return encodeURIComponent(JSON.stringify(key));
     }
 
 
     /**
      * Attempt to authenticate with the "remote service" using `key`.
      * @param key The secret key to use.
+     * @param onSuccess
+     * @param onFailure
      * @returns {boolean} Whether authentication succeeded or not.
      */
-    function attemptAuth(key) {
-        // I cba to write a 2d Array.prototype.equals, so:
-        if (key[0][0] == myKey[0][0]) return true;
-        else ui.wrongPass(); return false;
+    function attemptAuth(key, onSuccess, onFailure) {
+        jQuery.get(
+            API_URL + "/auth/token?key=" + formatKey(key)
+        ).then(function(response){
+            onSuccess(response.token);
+            sessionStorage.setItem("token", response.token);
+            getSecretInfo();
+        }, function(err){
+            if (onFailure) onFailure(err.error);
+            ui.wrongPass();
+        });
     }
 
 
@@ -75,3 +123,5 @@
               ui.stopRecording, ui.lock, ui.unlock);
     registerKeyPressCallbacks(auth);
 })();
+
+

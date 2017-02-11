@@ -31,3 +31,30 @@ h1>.glyphicon {
 .instructions>h3 {
     font-size: 5vh;
 }
+
+.secret-info {
+    visibility: hidden;
+
+    text-align: center;
+    margin: auto;
+    height: auto;
+    position: absolute;
+    top: 65vh; left: 0; bottom: 0; right: 0;
+    font-size: 5vh;
+    color: #ecf0f1;
+}
+
+#refresh-icon-wrapper {
+    color: #ecf0f1;
+    text-decoration: none;
+    text-underline: none;
+    text-underline-mode: none;
+}
+
+#refresh-icon-wrapper:hover {
+    color: #fcffff;
+}
+
+#refresh-icon {
+    font-size: 3vh;
+}
