@@ -6,11 +6,9 @@ Instead of using passcodes, it uses pass**chords**. *(groan)*
 
 
 
-If you have a MIDI keyboard, try the code in this repository out here:
+If you have a MIDI keyboard, try the code in this repository out here: **[🔓.ws](http://🔓.ws)** *(or click the image)*
 
-**[key.bede.io](https://key.bede.io)**
-
-[![screenshot of Key](./screenshot.png)](https://key.bede.io)
+[![screenshot of Key](./screenshot.png)](http://key.bede.io)
 
 *(Hint: play the Eb above middle C three times!)*
 
